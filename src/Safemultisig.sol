@@ -5,7 +5,7 @@ pragma solidity ^0.8.6;
 contract Safemultisig {
     mapping(address => bool) internal ownerState;
     mapping(uint256 => mapping(address => bool)) internal isConfirmed;
-    uint256 public maxOwners;
+    uint256 public maxOwners = 50;
     uint256 public threshold;
     address[] public owners;
 
@@ -68,21 +68,17 @@ contract Safemultisig {
 
     constructor(address[] memory _owners, uint256 _threshold)
         validInputs(_owners.length, _threshold)
+        payable
     {
         for (uint256 i = 0; i < _owners.length; i++) {
             require(
-                !ownerState[_owners[i]] && _owners[i] != address(0),
-                "Invalid Inputs."
-            );
-            require(
-                _owners[i] != _owners[i + 1],
-                "Owners must have different addresses."
+                !ownerState[_owners[i]],
+                "Those are invalid Inputs."
             );
             ownerState[_owners[i]] = true;
             owners.push(_owners[i]);
         }
         threshold = _threshold;
-        maxOwners = 50;
     }
 
     receive() external payable {
@@ -152,7 +148,7 @@ contract Safemultisig {
             "Not enough signers."
         );
         transaction.executed = true;
-        (bool success, ) = transaction.to.call{value: msg.value}(
+        (bool success, ) = transaction.to.call{value: transaction.value}(
             transaction.data
         );
         require(success, "Something went wrong.");

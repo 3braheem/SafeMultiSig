@@ -28,6 +28,18 @@ contract User {
         safe.executeTx(_txIndex);
     }
 
+    function addOwner(address _owner) public {
+        safe.addOwner(_owner);
+    }
+
+    function removeOwner(uint256 _index) public {
+        safe.removeOwner(_index);
+    }
+
+}
+
+contract Owns {
+    Safemultisig internal safe;
 }
 
 abstract contract SafemultisigTest is DSTest {
@@ -35,15 +47,17 @@ abstract contract SafemultisigTest is DSTest {
 
     // contracts
     Safemultisig internal safe;
-
+    Owns internal owns;
+    
     // users
     User internal alice;
     User internal bob;
+    address[] public sOwners;
 
     function setUp() public virtual {
-        safe = new Safemultisig();
-        alice = new User(address(safe));
-        bob = new User(address(safe));
-        safe.addOwner(address(alice));
+        sOwners.push(address(alice));
+        safe = new Safemultisig(sOwners, 1);
+        alice = new User(payable(address(safe)));
+        bob = new User(payable(address(safe)));
     }
 }

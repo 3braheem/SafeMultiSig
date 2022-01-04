@@ -156,7 +156,7 @@ contract Safemultisig {
     }
 
     function addOwner(address _owner)
-        external
+        internal
         notAnOwner(_owner)
         notNull(_owner)
         validInputs(owners.length + 1, threshold)
@@ -166,8 +166,29 @@ contract Safemultisig {
         owners.push(_owner);
     }
 
+    function addOwnerTx(address _owner) 
+        external 
+        notAnOwner(_owner)
+        notNull(_owner) 
+        validInputs(owners.length - 1, threshold) 
+    {
+        bytes memory payload = abi.encodeWithSignature("addOwner(address)", _owner);
+        uint256 txIndex = transactions.length;
+        transactions.push(
+            Transaction({
+                from: msg.sender,
+                to: address(this),
+                value: 0,
+                data: payload,
+                executed: false,
+                numConfirmations: 0
+            })
+        );
+        emit SubmitTransaction(msg.sender, txIndex, address(this), 0, payload);
+    }
+
     function removeOwner(uint256 _index)
-        external
+        internal
         isAnOwner(owners[_index])
         validInputs(owners.length - 1, threshold)
     {
@@ -175,8 +196,28 @@ contract Safemultisig {
         for (uint256 i = _index; i < owners.length - 1; i++) {
             owners[_index] = owners[_index + 1];
         }
-        owners.pop();
         ownerState[owners[_index]] = false;
+        owners.pop();
+    }
+
+    function removeOwnerTx(uint256 _index) 
+        external 
+        isAnOwner(owners[_index]) 
+        validInputs(owners.length - 1, threshold) 
+    {
+        bytes memory payload = abi.encodeWithSignature("removeOwner(uint256)", _index);
+        uint256 txIndex = transactions.length;
+        transactions.push(
+            Transaction({
+                from: msg.sender,
+                to: address(this),
+                value: 0,
+                data: payload,
+                executed: false,
+                numConfirmations: 0
+            })
+        );
+        emit SubmitTransaction(msg.sender, txIndex, address(this), 0, payload);
     }
 
     function contractBalance() external view returns (uint256) {

@@ -122,6 +122,13 @@ contract Safemultisig {
         _;
     }
 
+    /// @notice             Checks if tx at index `_index` has been confirmed by msg.sender
+    /// @param _txIndex     Index of tx in the Transactions array
+    modifier beenConfirmed(uint256 _txIndex) {
+        require(isConfirmed[_txIndex][msg.sender], "You have not confirmed this tx yet.");
+        _;
+    }
+
     /// @notice             Initializes new multi-sig wallet
     /// @param _owners      Array of owners of the wallet
     /// @param _threshold   Minimum required number of confirmations to execute a tx
@@ -192,6 +199,7 @@ contract Safemultisig {
         isAnOwner(msg.sender)
         txExists(_txIndex)
         notExecuted(_txIndex)
+        beenConfirmed(_txIndex)
     {
         Transaction storage transaction = transactions[_txIndex];
         require(

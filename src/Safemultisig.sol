@@ -228,7 +228,7 @@ contract Safemultisig {
     /// @notice             Function to add a new owner `_owner` to the wallet, must be sent as a tx
     /// @param _owner       New owner to be added
     function addOwner(address _owner)
-        internal
+        external
         notAnOwner(_owner)
         notNull(_owner)
         validInputs(owners.length + 1, threshold)
@@ -264,7 +264,7 @@ contract Safemultisig {
     /// @notice             Function to remove an owner at index `_index`, must be sent as a tx
     /// @param _index       Index of owner to be removed in owners array
     function removeOwner(uint256 _index)
-        internal
+        external
         isAnOwner(owners[_index])
         validInputs(owners.length - 1, threshold)
     {

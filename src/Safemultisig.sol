@@ -66,6 +66,18 @@ contract Safemultisig {
         bytes data
     );
 
+    /// @notice             Emitted when a new address `owner` becomes an owner
+    /// @param owner        Owner who was added to the owners array
+    event OwnerAdded(
+        address indexed owner
+    );
+
+    /// @notice             Emitted when an owner at index `index` is removed from owners array
+    /// @param index      Index at which the removed owner was
+    event OwnerRemoved(
+        uint256 indexed index
+    );
+
     /// @notice             Basic requirements for txs to be valid and working
     /// @param ownerCount   Amount of owners specified in the owners array
     /// @param _threshold   The minimum required owners to confirm a tx for it to be executable
@@ -161,7 +173,7 @@ contract Safemultisig {
     function submitTx(
         address _to,
         uint256 _value,
-        bytes memory _data
+        bytes calldata _data
     ) public isAnOwner(msg.sender) {
         uint256 txIndex = transactions.length;
         transactions.push(
@@ -244,6 +256,7 @@ contract Safemultisig {
         require(msg.sender == address(this), "Must be confirmed through wallet.");
         ownerState[_owner] = true;
         owners.push(_owner);
+        emit OwnerAdded(_owner);
     }
 
     /// @notice             Submits a tx to add new owner `_owner` to the wallet
@@ -282,6 +295,7 @@ contract Safemultisig {
         }
         ownerState[owners[_index]] = false;
         owners.pop();
+        emit OwnerRemoved(_index);
     }
 
     /// @notice             Submits a tx to remove owner at index `_index` from the wallet

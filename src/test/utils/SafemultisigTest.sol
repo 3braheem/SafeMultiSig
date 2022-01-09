@@ -52,6 +52,9 @@ abstract contract SafemultisigTest is DSTest {
     function setUp() public virtual {
         safe = new Safemultisig(sOwners, 1);
         alice = new User(payable(address(safe)));
+        safe.addOwnerTx(address(alice));
+        safe.confirmTx(0);
+        safe.executeTx(0);
         bob = new User(payable(address(safe)));
     }
 }

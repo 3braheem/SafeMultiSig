@@ -166,6 +166,13 @@ contract Safemultisig {
         }
     }
 
+    /// @notice             receive ether function
+    receive() external payable {
+        if (msg.value > 0) {
+            emit FundsReceived(msg.sender, msg.value);
+        }
+    }
+
     /// @notice             Submits a tx going to `_to` with value `_value` and data `_data`
     /// @param _to          Address to receive tx
     /// @param _value       Value to be included in tx 
@@ -326,9 +333,4 @@ contract Safemultisig {
         return address(this).balance;
     }
 
-    /// @notice             Helper function to retrieve owners of the wallet
-    /// @return             owners array
-    function walletOwners() external view returns (address[] memory) {
-        return owners;
-    }
 }

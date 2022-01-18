@@ -159,8 +159,8 @@ contract Safemultisig {
         threshold = _threshold;
     }
 
-    /// @notice             Receive ether function
-    receive() external payable {
+    /// @notice             fallback function
+    fallback() external payable {
         if (msg.value > 0) {
             emit FundsReceived(msg.sender, msg.value);
         }
